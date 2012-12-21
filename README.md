@@ -1,76 +1,22 @@
 ﻿VX ConnectBot
 =========
 
-Copyright (c) 2012 Martin Matuška <martin at matuska dot vx dot sk>
+As an Emacs fanatic, I am not satisfied with support for hardware keyboards in
+VX ConnectBot. Original project aims for the most universal solutions but it
+results in many things simply not working correctly. I got tired of trying to
+improve original keyboard support, so I threw away all the code and rewrite it
+to suite my own needs. The result is not impressive - it's simple hack based
+on hardcoding a lot of things, but it works like a charm!
 
-## Description
+Sadly, it will not work for you, unless you use the same tablet and bluetooth
+keyboard as I do. However, you can easily tune it for your devices. Just have
+a look on [TerminalKeyListener.java](https://github.com/luksow/connectbot/blob/master/src/sk/vx/connectbot/service/TerminalKeyListener.java)
+and change handleMultipleKeyDown, handleKeyDown and handleKeyUp to match your
+hardware.
 
-VX ConnectBot is an enhanced version of the popular open-source telnet and secure shell (SSH) client ConnectBot.
+If you have any questions, don't hesitate to contact me:
+Łukasz Sowa <contact at lukaszsowa dot pl>
 
-## Features and enhancements
-
- - based on ConnectBot 1.7.1
- - background file transfer (SCP protocol)
- - screen capture (save a PNG screenshot of the console)
- - character picker dialog (on-screen and hardware SYM keys)
- - single line input (on-screen key)
- - tap-and-hold to toggle full screen mode or change font size
- - tap-and hold on on-screen buttons with various manus
- - ssh-agent from Roberto Tyley
-  
-### New key mappings:
-
- - ALT + Up Arrow maps to Page Up
- - ALT + Down Arrow maps to Page Down
- - ALT + Left Arrow maps to Home
- - ALT + Right Arrow maps to End
- - ALT + Backspace maps to Insert
- - Search key maps to URL scan
-
-## Device Customization
-
-VX ConnectBot aims to provide customizations for Android devices with a physical keyboard.
-Currently, there are customizations for the following devices:
-
- - Full hardware keyboard (e.g. external bluetooth keyboard)
- - Samsung Captivate Glide (SGH-i927)
- - Sony Ericsson Xperia pro (MK16i)
- - Sony Ericsson Xperia mini pro (SK17i)
- 
-The following devices with physical keyboards are also reported to work properly:
- - ASUS Transformer Prime (TF201)
- - Motorola Droid 4 (XT894)
-
-Individual key mappings can be viewed [here](http://connectbot.vx.sk/customkeymap.html)
-
-## License
-
-VX ConnectBot is licensed under the Apache License, Version 2.0
-
-## Download
-
-[VX Connectbot Homepage](http://connectbot.vx.sk)
-
-[VX Connectbot on Android Market](https://market.android.com/details?id=sk.vx.connectbot)
-
-## Credits
-
-This software is based on [ConnectBot](http://code.google.com/p/connectbot/)
-
-ConnectBot Copyright (c) 2007-2011 [Kenny Root](http://the-b.org), [Jeffrey Sharkey](http://jsharkey.org)
-
-Based in part on the [Trilead SSH2 client](http://www.trilead.com), provided under a BSD-style license.  Copyright (c) 2007 Trilead AG.
-
-Also based on [JTA Telnet/SSH client](http://www.javassh.org), provided under the GPLv2 license. Copyright (c) Matthias L. Jugel, Marcus Meiner 1996-2005.
-
-Also based in part on the [JSOCKS](http://jsocks.sourceforge.net) library, provided under the GNU LGPL license. (c) 
-
-Also based in part on [JZlib](http://www.jcraft.com) provided under a BSD-style license. Copyright (c) JCraft, Inc., 2000-2004
-
-This software includes modifications from [Irssiconnectbot](https://github.com/irssiconnectbot/irssiconnectbot) developed by Iiro Uusitalo and Ville Kerminen.
-
-This software includes the [ssh-agent](https://github.com/rtyley) service developed by Roberto Tyley.
-
-SCP file transfer support is badsed on [modifications](https://github.com/staktrace/connectbot/commits/filetransfer) by Kartikaya Gupta.
-
-Internal file selection dialog is based on [Android File Dialog](http://code.google.com/p/android-file-dialog/) by Alexander Ponomarev, provided under a BSD-style license.
+## Things changed
+ - keyboard mappings
+ - selecting region for copying works with keyboard again

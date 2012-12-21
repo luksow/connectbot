@@ -40,6 +40,7 @@ import android.graphics.RectF;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.KeyEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.accessibility.AccessibilityEvent;
@@ -47,7 +48,6 @@ import android.view.accessibility.AccessibilityManager;
 import android.view.inputmethod.BaseInputConnection;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
-import android.view.ScaleGestureDetector;
 import android.widget.Toast;
 import de.mud.terminal.VDUBuffer;
 
@@ -226,20 +226,14 @@ public class TerminalView extends View implements FontSizeChangedListener {
 
 				int metaState = bridge.getKeyHandler().getMetaState();
 
-				if ((metaState & TerminalKeyListener.META_SHIFT_ON) != 0)
+				if ((metaState & TerminalKeyListener.SHIFT_ANY_MASK) != 0)
 					canvas.drawPath(shiftCursor, cursorStrokePaint);
-				else if ((metaState & TerminalKeyListener.META_SHIFT_LOCK) != 0)
-					canvas.drawPath(shiftCursor, cursorPaint);
 
-				if ((metaState & TerminalKeyListener.META_ALT_ON) != 0)
+				if ((metaState & TerminalKeyListener.ALT_ANY_MASK) != 0)
 					canvas.drawPath(altCursor, cursorStrokePaint);
-				else if ((metaState & TerminalKeyListener.META_ALT_LOCK) != 0)
-					canvas.drawPath(altCursor, cursorPaint);
 
-				if ((metaState & TerminalKeyListener.META_CTRL_ON) != 0)
+				if ((metaState & TerminalKeyListener.CTRL_ANY_MASK) != 0)
 					canvas.drawPath(ctrlCursor, cursorStrokePaint);
-				else if ((metaState & TerminalKeyListener.META_CTRL_LOCK) != 0)
-					canvas.drawPath(ctrlCursor, cursorPaint);
 
 				// Restore previous clip region
 				canvas.restore();
@@ -458,7 +452,7 @@ public class TerminalView extends View implements FontSizeChangedListener {
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
         float mScaleFactor = detector.getScaleFactor();
-        
+
 				if(mScaleFactor > 1.1) {
 					bridge.increaseFontSize();
 					return true;

@@ -450,7 +450,6 @@ public class ConsoleActivity extends Activity implements FileChooserCallback {
 				TerminalView terminal = (TerminalView)flip;
 
 				TerminalKeyListener handler = terminal.bridge.getKeyHandler();
-				handler.metaPress(TerminalKeyListener.META_CTRL_ON);
 
 				keyboardGroup.setVisibility(View.GONE);
 				actionBar.hide();

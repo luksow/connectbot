@@ -300,6 +300,9 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 			case 'o':
 				plchar = 'ó';
 				break;
+			case 's':
+				plchar = 'ś';
+				break;
 			case 'x':
 				plchar = 'ź';
 				break;

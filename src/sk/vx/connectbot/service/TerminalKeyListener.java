@@ -107,10 +107,6 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 	 */
 	public boolean onKey(View v, int keyCode, KeyEvent event) {
 
-		// I simply don't care about other hardware keyboards
-		if (!customKeyboard.equals(PreferenceConstants.CUSTOM_KEYMAP_FULL))
-			return false;
-
 		try {
 			switch (event.getAction()) {
 			case KeyEvent.ACTION_MULTIPLE:
@@ -139,6 +135,14 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 	}
 
 	public boolean handleMultipleKeyDown(View v, KeyEvent event) throws UnsupportedEncodingException, IOException {
+		if(event.getCharacters().equals("£")) {
+			bridge.transport.write(Character.valueOf('#').toString().getBytes(encoding));
+			return true;
+		} else if(event.getCharacters().equals("¬")) {
+			bridge.transport.write(Character.valueOf('~').toString().getBytes(encoding));
+			return true;
+		}
+
 		byte[] input = event.getCharacters().getBytes(encoding);
 		bridge.transport.write(input);
 		return true;
@@ -146,32 +150,32 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 
 	public boolean handleKeyDown(View v, KeyEvent event) throws IOException {
 		// special cases based on scancodes which are hardware dependent!
-		switch (event.getScanCode()) {
-		case 29:
+		switch (event.getKeyCode()) {
+		case KeyEvent.KEYCODE_CTRL_LEFT:
 			metaKeyDown(CTRL_LEFT_MASK);
 			return true;
-		case -1:
+		case KeyEvent.KEYCODE_CTRL_RIGHT:
 			metaKeyDown(CTRL_RIGHT_MASK);
 			return true;
-		case 56:
+		case KeyEvent.KEYCODE_ALT_LEFT:
 			metaKeyDown(ALT_LEFT_MASK);
 			return true;
-		case 100:
+		case KeyEvent.KEYCODE_ALT_RIGHT:
 			metaKeyDown(ALT_RIGHT_MASK);
 			return true;
-		case 42:
+		case KeyEvent.KEYCODE_SHIFT_LEFT:
 			metaKeyDown(SHIFT_LEFT_MASK);
 			return true;
-		case 54:
+		case KeyEvent.KEYCODE_SHIFT_RIGHT:
 			metaKeyDown(SHIFT_RIGHT_MASK);
 			return true;
-		case 14:
+		case KeyEvent.KEYCODE_DEL:
 			vt.keyPressed(vt320.KEY_BACK_SPACE, ' ', getVtMetaState());
 			return true;
-		case 172:
+		case KeyEvent.KEYCODE_ESCAPE:
 			sendEscape();
 			return true;
-		case 15:
+		case KeyEvent.KEYCODE_TAB:
 			if (bridge.isSelectingForCopy()) {
 				if (selectionArea.isSelectingOrigin())
 					selectionArea.finishSelectingOrigin();
@@ -189,93 +193,122 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 			}
 			bridge.transport.write(0x09);
 			return true;
-		case 110:
+		case KeyEvent.KEYCODE_INSERT:
 			vt.keyPressed(vt320.KEY_INSERT, ' ', getVtMetaState());
 			return true;
-		case 111:
+		case KeyEvent.KEYCODE_FORWARD_DEL:
 			vt.keyPressed(vt320.KEY_DELETE, ' ', 0);
 			return true;
-		case 105:
+		case KeyEvent.KEYCODE_DPAD_LEFT:
 			if (bridge.isSelectingForCopy()) {
 				bridge.getSelectionArea().decrementColumn();
 				bridge.redraw();
 				return true;
 			}
-			vt.keyPressed(vt320.KEY_LEFT, ' ', getVtMetaState());
+			if (metaState == 0)
+				vt.keyPressed(vt320.KEY_LEFT, ' ', getVtMetaState());
+			else if ((metaState & CTRL_ANY_MASK) != 0 && (metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;6D".getBytes());
+			else if ((metaState & CTRL_ANY_MASK) != 0)
+				vt.write("\u001b[1;5D".getBytes());
+			else if ((metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;2D".getBytes());
 			return true;
-		case 103:
+		case KeyEvent.KEYCODE_DPAD_UP:
 			if (bridge.isSelectingForCopy()) {
 				bridge.getSelectionArea().decrementRow();
 				bridge.redraw();
 				return true;
 			}
-			vt.keyPressed(vt320.KEY_UP, ' ', getVtMetaState());
+			if (metaState == 0)
+				vt.keyPressed(vt320.KEY_UP, ' ', getVtMetaState());
+			else if ((metaState & CTRL_ANY_MASK) != 0 && (metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;6A".getBytes());
+			else if ((metaState & CTRL_ANY_MASK) != 0)
+				vt.write("\u001b[1;5A".getBytes());
+			else if ((metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;2A".getBytes());
 			return true;
-		case 106:
+		case KeyEvent.KEYCODE_DPAD_RIGHT:
 			if (bridge.isSelectingForCopy()) {
 				bridge.getSelectionArea().incrementColumn();
 				bridge.redraw();
 				return true;
 			}
-			vt.keyPressed(vt320.KEY_RIGHT, ' ', getVtMetaState());
+			if (metaState == 0)
+				vt.keyPressed(vt320.KEY_RIGHT, ' ', getVtMetaState());
+			else if ((metaState & CTRL_ANY_MASK) != 0 && (metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;6C".getBytes());
+			else if ((metaState & CTRL_ANY_MASK) != 0)
+				vt.write("\u001b[1;5C".getBytes());
+			else if ((metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;2C".getBytes());
 			return true;
-		case 108:
+		case KeyEvent.KEYCODE_DPAD_DOWN:
 			if (bridge.isSelectingForCopy()) {
 				bridge.getSelectionArea().incrementRow();
 				bridge.redraw();
 				return true;
 			}
-			vt.keyPressed(vt320.KEY_DOWN, ' ', getVtMetaState());
+			if (metaState == 0)
+				vt.keyPressed(vt320.KEY_DOWN, ' ', getVtMetaState());
+			else if ((metaState & CTRL_ANY_MASK) != 0 && (metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;6B".getBytes());
+			else if ((metaState & CTRL_ANY_MASK) != 0)
+				vt.write("\u001b[1;5B".getBytes());
+			else if ((metaState & SHIFT_ANY_MASK) != 0)
+				vt.write("\u001b[1;2B".getBytes());
 			return true;
-		case 59:
+		case KeyEvent.KEYCODE_F1:
 			vt.keyPressed(vt320.KEY_F1, ' ', getVtMetaState());
 			return true;
-		case 60:
+		case KeyEvent.KEYCODE_F2:
 			vt.keyPressed(vt320.KEY_F2, ' ', getVtMetaState());
 			return true;
-		case 61:
+		case KeyEvent.KEYCODE_F3:
 			vt.keyPressed(vt320.KEY_F3, ' ', getVtMetaState());
 			return true;
-		case 62:
+		case KeyEvent.KEYCODE_F4:
 			vt.keyPressed(vt320.KEY_F4, ' ', getVtMetaState());
 			return true;
-		case 63:
+		case KeyEvent.KEYCODE_F5:
 			vt.keyPressed(vt320.KEY_F5, ' ', getVtMetaState());
 			return true;
-		case 64:
+		case KeyEvent.KEYCODE_F6:
 			vt.keyPressed(vt320.KEY_F6, ' ', getVtMetaState());
 			return true;
-		case 65:
+		case KeyEvent.KEYCODE_F7:
 			vt.keyPressed(vt320.KEY_F7, ' ', getVtMetaState());
 			return true;
-		case 66:
+		case KeyEvent.KEYCODE_F8:
 			vt.keyPressed(vt320.KEY_F8, ' ', getVtMetaState());
 			return true;
-		case 67:
+		case KeyEvent.KEYCODE_F9:
 			vt.keyPressed(vt320.KEY_F9, ' ', getVtMetaState());
 			return true;
-		case 68:
+		case KeyEvent.KEYCODE_F10:
 			vt.keyPressed(vt320.KEY_F10, ' ', getVtMetaState());
 			return true;
-		case 87:
+		case KeyEvent.KEYCODE_F11:
 			vt.keyPressed(vt320.KEY_F11, ' ', getVtMetaState());
 			return true;
-		case 88:
+		case KeyEvent.KEYCODE_F12:
 			vt.keyPressed(vt320.KEY_F12, ' ', getVtMetaState());
 			return true;
-		case 139:
-			// menu
-			return false;
-		case 158:
-			// back
-			return false;
-		}
-
-		// special cases based on keycodes
-		switch(event.getKeyCode()) {
-		case 67:
-			vt.keyPressed(vt320.KEY_BACK_SPACE, ' ', getVtMetaState());
+		case KeyEvent.KEYCODE_MOVE_HOME:
+			vt.keyPressed(vt320.KEY_HOME, ' ', getVtMetaState());
 			return true;
+		case KeyEvent.KEYCODE_PAGE_UP:
+			vt.keyPressed(vt320.KEY_PAGE_UP, ' ', getVtMetaState());
+			return true;
+		case KeyEvent.KEYCODE_PAGE_DOWN:
+			vt.keyPressed(vt320.KEY_PAGE_DOWN, ' ', getVtMetaState());
+			return true;
+		case KeyEvent.KEYCODE_MOVE_END:
+			vt.keyPressed(vt320.KEY_END, ' ', getVtMetaState());
+			return true;
+		case KeyEvent.KEYCODE_BACK:
+			return false;
 		}
 
 		// special cases for polish diacritics
@@ -321,23 +354,15 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 		}
 
 		int uchar = 0;
-		// <-- ugly special cases
-		if (event.getKeyCode() == 75 && event.getMetaState() == 1) {
+		// apply shift to some ugly special cases
+		if (event.getKeyCode() == KeyEvent.KEYCODE_APOSTROPHE && (metaState & SHIFT_ANY_MASK) != 0)
 			uchar = '@';
-		} else if (event.getKeyCode() == 77) {
+		else if (event.getKeyCode() == KeyEvent.KEYCODE_2 && (metaState & SHIFT_ANY_MASK) != 0)
 			uchar = '"';
-		} else if (event.getScanCode() == 41 && (metaState & SHIFT_ANY_MASK) != 0) {
-			uchar = '~';
-		} else if (event.getScanCode() == 41 && (metaState & SHIFT_ANY_MASK) == 0) {
-			uchar = '`';
-		} else if (event.getKeyCode() == 48 && event.getMetaState() == 3) {
+		else if (event.getKeyCode() == KeyEvent.KEYCODE_3 && (metaState & SHIFT_ANY_MASK) != 0)
 			uchar = '#';
-		} else if (event.getKeyCode() == 30 && event.getMetaState() == 2) {
-			uchar = '<';
-		}  else if (event.getKeyCode() == 42 && event.getMetaState() == 2) {
-			uchar = '>';
-		} // ugly special cases -->
-		// apply shift
+		else if (event.getKeyCode() == KeyEvent.KEYCODE_APOSTROPHE && (metaState & SHIFT_ANY_MASK) != 0)
+			uchar = '"';
 		else if ((metaState & SHIFT_ANY_MASK) != 0) {
 			uchar = event.getUnicodeChar(KeyEvent.META_SHIFT_ON);
 		} else {
@@ -360,23 +385,23 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 	}
 
 	public boolean handleKeyUp(View v, KeyEvent event) {
-		switch (event.getScanCode()) {
-		case 29:
+		switch (event.getKeyCode()) {
+		case KeyEvent.KEYCODE_CTRL_LEFT:
 			metaKeyUp(CTRL_LEFT_MASK);
 			return true;
-		case -1:
+		case KeyEvent.KEYCODE_CTRL_RIGHT:
 			metaKeyUp(CTRL_RIGHT_MASK);
 			return true;
-		case 56:
+		case KeyEvent.KEYCODE_ALT_LEFT:
 			metaKeyUp(ALT_LEFT_MASK);
 			return true;
-		case 100:
+		case KeyEvent.KEYCODE_ALT_RIGHT:
 			metaKeyUp(ALT_RIGHT_MASK);
 			return true;
-		case 42:
+		case KeyEvent.KEYCODE_SHIFT_LEFT:
 			metaKeyUp(SHIFT_LEFT_MASK);
 			return true;
-		case 54:
+		case KeyEvent.KEYCODE_SHIFT_RIGHT:
 			metaKeyUp(SHIFT_RIGHT_MASK);
 			return true;
 		}

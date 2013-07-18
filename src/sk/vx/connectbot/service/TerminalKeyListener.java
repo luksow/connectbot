@@ -537,4 +537,3 @@ public class TerminalKeyListener implements OnKeyListener, OnSharedPreferenceCha
 		}
 	}
 }
-
